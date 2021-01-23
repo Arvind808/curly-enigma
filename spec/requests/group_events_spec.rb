@@ -12,116 +12,135 @@ require 'rails_helper'
 # of tools you can use to make these specs even more expressive, but we're
 # sticking to rails and rspec-rails APIs to keep things simple and stable.
 
-RSpec.describe "/group_events", type: :request do
+RSpec.describe '/group_events', type: :request do
   # This should return the minimal set of attributes required to create a valid
   # GroupEvent. As you add validations to GroupEvent, be sure to
   # adjust the attributes here as well.
-  let(:valid_attributes) {
-    skip("Add a hash of attributes valid for your model")
-  }
+  let(:valid_attributes) do
+    {
+      name: 'name',
+      description: 'desc',
+      location: 'location',
+      start_at: 3.days.ago,
+      end_at: Date.today,
+      duration: 3,
+      status: 'draft'
+    }
+  end
 
-  let(:invalid_attributes) {
-    skip("Add a hash of attributes invalid for your model")
-  }
+  let(:invalid_attributes) do
+    {
+      name: '',
+      description: '',
+      location: '',
+      start_at: '',
+      end_at: '',
+      duration: '',
+      status: ''
+    }
+  end
 
   # This should return the minimal set of values that should be in the headers
   # in order to pass any filters (e.g. authentication) defined in
   # GroupEventsController, or in your router and rack
   # middleware. Be sure to keep this updated too.
-  let(:valid_headers) {
+  let(:valid_headers) do
     {}
-  }
+  end
 
-  describe "GET /index" do
-    it "renders a successful response" do
+  describe 'GET /index' do
+    it 'renders a successful response' do
       GroupEvent.create! valid_attributes
       get group_events_url, headers: valid_headers, as: :json
       expect(response).to be_successful
     end
   end
 
-  describe "GET /show" do
-    it "renders a successful response" do
+  describe 'GET /show' do
+    it 'renders a successful response' do
       group_event = GroupEvent.create! valid_attributes
       get group_event_url(group_event), as: :json
       expect(response).to be_successful
     end
   end
 
-  describe "POST /create" do
-    context "with valid parameters" do
-      it "creates a new GroupEvent" do
-        expect {
+  describe 'POST /create' do
+    context 'with valid parameters' do
+      it 'creates a new GroupEvent' do
+        expect do
           post group_events_url,
                params: { group_event: valid_attributes }, headers: valid_headers, as: :json
-        }.to change(GroupEvent, :count).by(1)
+        end.to change(GroupEvent, :count).by(1)
       end
 
-      it "renders a JSON response with the new group_event" do
+      it 'renders a JSON response with the new group_event' do
         post group_events_url,
              params: { group_event: valid_attributes }, headers: valid_headers, as: :json
         expect(response).to have_http_status(:created)
-        expect(response.content_type).to match(a_string_including("application/json"))
+        expect(response.content_type).to match(a_string_including('application/json'))
       end
     end
 
-    context "with invalid parameters" do
-      it "does not create a new GroupEvent" do
-        expect {
+    context 'with invalid parameters' do
+      it 'it should create a draft event' do
+        expect do
           post group_events_url,
                params: { group_event: invalid_attributes }, as: :json
-        }.to change(GroupEvent, :count).by(0)
-      end
-
-      it "renders a JSON response with errors for the new group_event" do
-        post group_events_url,
-             params: { group_event: invalid_attributes }, headers: valid_headers, as: :json
-        expect(response).to have_http_status(:unprocessable_entity)
-        expect(response.content_type).to eq("application/json")
+        end.to change(GroupEvent, :count).by(1)
       end
     end
   end
 
-  describe "PATCH /update" do
-    context "with valid parameters" do
-      let(:new_attributes) {
-        skip("Add a hash of attributes valid for your model")
-      }
+  describe 'PATCH /update' do
+    context 'with valid parameters' do
+      let(:new_attributes) do
+        {
+          name: 'updated name',
+          description: 'updated desc',
+          location: 'updated location',
+          start_at: 2.days.ago,
+          end_at: Date.today,
+          duration: 2,
+          status: 'published'
+        }
+      end
 
-      it "updates the requested group_event" do
+      it 'updates the requested group_event' do
         group_event = GroupEvent.create! valid_attributes
         patch group_event_url(group_event),
               params: { group_event: new_attributes }, headers: valid_headers, as: :json
         group_event.reload
-        skip("Add assertions for updated state")
+        expect(group_event.name).to eq('updated name')
+        expect(group_event.location).to eq('updated location')
+        expect(group_event.status).to eq('published')
       end
 
-      it "renders a JSON response with the group_event" do
+      it 'renders a JSON response with the group_event' do
         group_event = GroupEvent.create! valid_attributes
         patch group_event_url(group_event),
               params: { group_event: new_attributes }, headers: valid_headers, as: :json
         expect(response).to have_http_status(:ok)
-        expect(response.content_type).to match(a_string_including("application/json"))
+        expect(response.content_type).to match(a_string_including('application/json'))
       end
     end
 
-    context "with invalid parameters" do
-      it "renders a JSON response with errors for the group_event" do
+    context 'with invalid parameters' do
+      it 'renders a JSON response with errors for the group_event' do
         group_event = GroupEvent.create! valid_attributes
         patch group_event_url(group_event),
               params: { group_event: invalid_attributes }, headers: valid_headers, as: :json
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(response.content_type).to eq("application/json")
+        expect(response.content_type).to eq('application/json')
       end
     end
   end
 
-  describe "DELETE /destroy" do
-    it "destroys the requested group_event" do
+  describe 'DELETE /destroy' do
+    it 'discard the record and keep in db' do
       group_event = GroupEvent.create! valid_attributes
-      expect {
+      expect do
         delete group_event_url(group_event), headers: valid_headers, as: :json
-      }.to change(GroupEvent, :count).by(-1)
+      end.to change(GroupEvent, :count).by(0)
     end
   end
 end
